@@ -408,9 +408,9 @@
 <section id="destaques">
   <div class="wrap">
     <div class="section-head">
-      <p class="eyebrow">Sob encomenda</p>
+      <p class="eyebrow">Estoque atual</p>
       <h2>Produtos em <em style="color:var(--orange-2);font-style:normal;">destaque</em></h2>
-      <p>Alguns exemplos do que conseguimos trazer sob encomenda através do nosso fornecedor parceiro. Fotos reais chegam assim que a gente formaliza o material de divulgação — por enquanto, confirme disponibilidade e preço atualizado direto no WhatsApp.</p>
+      <p>Direto do nosso estoque, com preço atualizado. Confirme disponibilidade e feche o pedido pelo WhatsApp.</p>
     </div>
     <div class="price-cards" id="destaquesContainer"></div>
   </div>
@@ -534,15 +534,60 @@
      - icon: um emoji pra representar o produto (usado só se não tiver foto)
      - titulo: nome do produto
      - preco: o valor (deixe só números, vírgula e ponto, ex: "89,90")
-     - tag: o textinho da etiqueta (ex: "Encomenda", "Pronta entrega")
+     - tag: a categoria do produto (ex: "Seda", "Piteira", "Essência", "Acessório")
   */
 
   const produtosDestaque = [
-    { icon: "💨", titulo: "Kit Narguilé Alfarid Storm Dourado (P)", preco: "423,00", tag: "Encomenda" },
-    { icon: "📄", titulo: "Seda RAW Classic 300's 1/4", preco: "45,00", tag: "Encomenda" },
-    { icon: "📄", titulo: "Seda RAW Black Orgânica King Size", preco: "14,00", tag: "Encomenda" },
-    { icon: "🎒", titulo: "Kit Case Preta + Seda RAW + Piteira de Vidro", preco: "280,72", tag: "Encomenda" },
-    { icon: "🧰", titulo: "Kit Case + Cuia Silicone + Tesoura + Seda + Piteira", preco: "90,40", tag: "Encomenda" },
+    // — Sedas —
+    { foto: "assets/produtos/seda-raw-black.jpg", titulo: "Seda RAW Black", preco: "8,00", tag: "Seda" },
+    { foto: "assets/produtos/seda-raw-organic.jpg", titulo: "Seda RAW Organic", preco: "5,00", tag: "Seda" },
+    { foto: "assets/produtos/seda-king.jpg", titulo: "Seda King", preco: "3,00", tag: "Seda" },
+    { foto: "assets/produtos/seda-smoking-king.jpg", titulo: "Seda Smoking King Size", preco: "5,00", tag: "Seda" },
+    { foto: "assets/produtos/seda-smoking-supreme.jpg", titulo: "Seda Smoking Supreme", preco: "6,00", tag: "Seda" },
+    { foto: "assets/produtos/seda-papelito.jpg", titulo: "Seda Papelito Slim Longa", preco: "4,00", tag: "Seda" },
+    { icon: "📄", titulo: "Seda OCB Ultimate Slim KS", preco: "5,00", tag: "Seda" },
+    { icon: "📄", titulo: "Seda Bem Bolado POP Slim", preco: "4,00", tag: "Seda" },
+    { icon: "📄", titulo: "Seda LRC Alfafa King Size", preco: "5,00", tag: "Seda" },
+    { icon: "📄", titulo: "Seda Aleda Ouro King Size", preco: "4,00", tag: "Seda" },
+    { icon: "📄", titulo: "Seda Aleda Prata King Size", preco: "4,00", tag: "Seda" },
+    { icon: "📄", titulo: "Seda Saduh Night Large", preco: "6,00", tag: "Seda" },
+    { icon: "📄", titulo: "Zomo Natural", preco: "2,00", tag: "Seda" },
+
+    // — Piteiras —
+    { icon: "🚬", titulo: "Tonabê", preco: "7,00", tag: "Piteira" },
+    { icon: "🚬", titulo: "Piteira Smoking", preco: "5,00", tag: "Piteira" },
+    { icon: "🚬", titulo: "Piteira King", preco: "3,00", tag: "Piteira" },
+    { icon: "🚬", titulo: "Piteira Bem Bolado", preco: "4,00", tag: "Piteira" },
+    { icon: "🚬", titulo: "Piteira Papelito Mega Longa", preco: "7,00", tag: "Piteira" },
+    { icon: "🚬", titulo: "Piteira Tonabê Double Cotton", preco: "5,00", tag: "Piteira" },
+    { icon: "🔬", titulo: "Piteira de Vidro (unidade)", preco: "5,00", tag: "Piteira" },
+    { icon: "🔬", titulo: "Piteira Dupla (com limpador)", preco: "10,00", tag: "Piteira" },
+
+    // — Essências (Nay) —
+    { icon: "🍃", titulo: "Nay Banana Melon", preco: "10,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Nay Pineapple Twist", preco: "10,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Nay Strawberry Blend", preco: "10,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Nay Pineapple Grape", preco: "10,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Nay Snow", preco: "10,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Dublin Menta", preco: "16,00", tag: "Tabaco" },
+
+    // — Blunt —
+    { icon: "🍂", titulo: "Blunt King Chocolate", preco: "9,00", tag: "Blunt" },
+    { icon: "🍂", titulo: "Blunt King Maçã Verde", preco: "9,00", tag: "Blunt" },
+    { icon: "🍂", titulo: "Blunt King Melancia", preco: "9,00", tag: "Blunt" },
+
+    // — Acessórios —
+    { icon: "⚙️", titulo: "Dichavador de Coco", preco: "3,00", tag: "Acessório" },
+    { foto: "assets/produtos/dichavador-bem-bolado.jpg", titulo: "Dichavador Bem Bolado", preco: "10,00", tag: "Acessório" },
+    { icon: "🔥", titulo: "Isqueiro Bic Pequeno", preco: "4,00", tag: "Acessório" },
+    { icon: "🖊️", titulo: "Clipper", preco: "8,00", tag: "Acessório" },
+    { foto: "assets/produtos/filtros.jpg", titulo: "Filtros", preco: "9,00", tag: "Acessório" },
+    { icon: "✂️", titulo: "Tesoura Metal Ponta Redonda", preco: "30,00", tag: "Acessório" },
+    { icon: "🧴", titulo: "Tubete Rok", preco: "9,00", tag: "Acessório" },
+    { icon: "🧪", titulo: "Coletor de Extração Grande", preco: "50,00", tag: "Acessório" },
+    { icon: "🧊", titulo: "Slick de Vidro 2 Partes 9ml", preco: "30,00", tag: "Acessório" },
+    { icon: "🥥", titulo: "Cuia King", preco: "15,00", tag: "Acessório" },
+    { icon: "🥥", titulo: "Cuia King Roxa", preco: "15,00", tag: "Acessório" },
     // 👆 copie um bloco acima, cole aqui embaixo e edite pra adicionar um novo produto
   ];
 
@@ -562,7 +607,7 @@
       <span class="tag">${p.tag}</span>
       ${p.foto ? `<img class="foto" src="${p.foto}" alt="${p.titulo}">` : `<span class="icon">${p.icon}</span>`}
       <h3>${p.titulo}</h3>
-      <p class="price">R$ ${p.preco}<small>valor de referência, sujeito a confirmação</small></p>
+      <p class="price">R$ ${p.preco}<small>confirme disponibilidade no WhatsApp</small></p>
       <a href="${whatsappLink}" target="_blank" rel="noopener" class="btn btn-primary">Peça no Zap</a>
     </div>
   `).join('');
