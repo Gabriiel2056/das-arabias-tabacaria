@@ -191,6 +191,7 @@
   }
   .card:hover{transform:translateY(-6px);border-color:var(--orange);background:rgba(242,134,29,.06);}
   .card .icon{font-size:2.2rem;margin-bottom:16px;display:block;}
+  .card .icon-img{width:76px;height:76px;object-fit:contain;margin-bottom:14px;display:block;}
   .card .foto{width:100%;height:140px;object-fit:cover;border-radius:12px;margin-bottom:16px;}
   .card h3{font-size:1.15rem;color:var(--gold);margin-bottom:10px;font-family:'Manrope',sans-serif;font-weight:800;}
   .card p{font-size:.92rem;color:#c9d6da;margin:0;}
@@ -232,6 +233,43 @@
     padding:4px 10px;border-radius:20px;letter-spacing:.5px;
   }
   .price-card .btn{margin-top:8px;justify-content:center;padding:11px 18px;font-size:.85rem;}
+
+  /* ===== MODAL DE PRODUTO ===== */
+  .produto-modal{
+    position:fixed;inset:0;z-index:998;
+    background:rgba(5,13,19,.88);
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .produto-modal.hidden{display:none;}
+  .produto-modal-box{
+    max-width:420px;width:100%;
+    background:var(--teal-deep);border:1px solid rgba(244,201,93,.3);
+    border-radius:22px;overflow:hidden;
+    box-shadow:0 30px 70px rgba(0,0,0,.6);
+    position:relative;
+    max-height:88vh;overflow-y:auto;
+  }
+  .produto-modal-close{
+    position:absolute;top:14px;right:14px;z-index:2;
+    width:34px;height:34px;border-radius:50%;
+    background:rgba(8,22,31,.7);color:var(--cream);border:none;
+    font-size:1.1rem;cursor:pointer;line-height:1;
+  }
+  .produto-modal-media{width:100%;height:240px;display:flex;align-items:center;justify-content:center;background:var(--ink);}
+  .produto-modal-media img{width:100%;height:100%;object-fit:cover;}
+  .produto-modal-media .icon{font-size:5rem;}
+  .produto-modal-body{padding:26px;}
+  .produto-modal-body .tag{
+    display:inline-block;font-family:'Space Mono',monospace;font-size:.7rem;text-transform:uppercase;
+    background:rgba(74,143,91,.2);color:#bfe2c8;border:1px solid var(--cactus);
+    padding:4px 12px;border-radius:20px;letter-spacing:.5px;margin-bottom:12px;
+  }
+  .produto-modal-body h3{font-size:1.3rem;color:var(--cream);margin-bottom:10px;font-family:'Manrope',sans-serif;font-weight:800;}
+  .produto-modal-body .desc{color:#c9d6da;font-size:.95rem;line-height:1.6;margin-bottom:18px;}
+  .produto-modal-body .price{font-family:'Space Mono',monospace;color:var(--gold);font-size:1.5rem;font-weight:700;margin-bottom:20px;}
+  .produto-modal-body .price small{display:block;color:#8fa3aa;font-size:.68rem;font-weight:400;margin-top:2px;}
+  .produto-modal-body .btn{width:100%;justify-content:center;}
 
   /* ===== FRETE ===== */
   #frete{background:var(--teal-deep);}
@@ -352,6 +390,23 @@
       <button class="gate-no" id="gateNo">Não, sair do site</button>
     </div>
     <p class="gate-legal">Venda destinada exclusivamente a maiores de 18 anos, conforme legislação aplicável.</p>
+  </div>
+</div>
+
+<div class="produto-modal hidden" id="produtoModal" onclick="if(event.target===this) fecharModalProduto()">
+  <div class="produto-modal-box">
+    <button type="button" class="produto-modal-close" onclick="fecharModalProduto()">✕</button>
+    <div class="produto-modal-media" id="modalMedia">
+      <img id="modalFoto" src="" alt="" style="display:none;">
+      <span class="icon" id="modalIcon"></span>
+    </div>
+    <div class="produto-modal-body">
+      <span class="tag" id="modalTag"></span>
+      <h3 id="modalTitulo"></h3>
+      <p class="desc" id="modalTexto"></p>
+      <p class="price" id="modalPreco"></p>
+      <a href="https://wa.me/c/5516996511439" target="_blank" rel="noopener" class="btn btn-primary">💬 Peça no Zap</a>
+    </div>
   </div>
 </div>
 
@@ -530,16 +585,16 @@
 
   // Lista de reserva — usada só se SHEET_CSV_URL estiver vazio ou a planilha falhar ao carregar
   const categoriasProdutosPadrao = [
-    { icon: "💨", titulo: "Nargs", texto: "Narguilés completos e peças avulsas pra montar o seu do seu jeito." },
-    { icon: "🍃", titulo: "Essências & Tabacos", texto: "Marcas como Dublin, Amsterdam, Acrema Blend, NAY, ZGY e Smyrna sempre na área." },
-    { icon: "🫧", titulo: "Bong", texto: "De vidro, acrílico ou silicone — e as peças de reposição pra manter tudo em ordem." },
-    { icon: "🪵", titulo: "Pipe", texto: "Modelos de metal, madeira, pedra e vidro." },
-    { icon: "📄", titulo: "Sedas & Piteiras", texto: "RAW, papel de alfalfa e outras opções pra quem gosta de qualidade no detalhe." },
-    { icon: "⚙️", titulo: "Dichavador", texto: "De metal, madeira ou plástico — pra uma moagem rápida e caprichada." },
-    { icon: "🔥", titulo: "Isqueiro & Cinzeiro", texto: "Isqueiros, maçaricos e cinzeiros abertos ou com tampa." },
-    { icon: "🌾", titulo: "Palheiros", texto: "Seleção de palheiros pra quem já sabe o que gosta." },
-    { icon: "🎒", titulo: "Acessórios", texto: "Bandejas, potes, chaveiros, incensos e tudo que falta pro seu setup." },
-    { icon: "✨", titulo: "Novidades", texto: "Chegada de produto novo sempre no story do Instagram — fica de olho." },
+    { foto: "assets/icones/nargs.png", titulo: "Nargs", texto: "Narguilés completos e peças avulsas pra montar o seu do seu jeito." },
+    { foto: "assets/icones/essencias-tabacos.png", titulo: "Essências & Tabacos", texto: "Marcas como Dublin, Amsterdam, Acrema Blend, NAY, ZGY e Smyrna sempre na área." },
+    { foto: "assets/icones/bong.png", titulo: "Bong", texto: "De vidro, acrílico ou silicone — e as peças de reposição pra manter tudo em ordem." },
+    { foto: "assets/icones/pipe.png", titulo: "Pipe", texto: "Modelos de metal, madeira, pedra e vidro." },
+    { foto: "assets/icones/sedas-piteiras.png", titulo: "Sedas & Piteiras", texto: "RAW, papel de alfalfa e outras opções pra quem gosta de qualidade no detalhe." },
+    { foto: "assets/icones/dichavador.png", titulo: "Dichavador", texto: "De metal, madeira ou plástico — pra uma moagem rápida e caprichada." },
+    { foto: "assets/icones/isqueiro-cinzeiro.png", titulo: "Isqueiro & Cinzeiro", texto: "Isqueiros, maçaricos e cinzeiros abertos ou com tampa." },
+    { foto: "assets/icones/palheiros.png", titulo: "Palheiros", texto: "Seleção de palheiros pra quem já sabe o que gosta." },
+    { foto: "assets/icones/acessorios.png", titulo: "Acessórios", texto: "Bandejas, potes, chaveiros, incensos e tudo que falta pro seu setup." },
+    { foto: "assets/icones/novidades.png", titulo: "Novidades", texto: "Chegada de produto novo sempre no story do Instagram — fica de olho." },
   ];
 
   const produtosDestaquePadrao = [
@@ -570,21 +625,27 @@
 
     // — Essências (Nay) —
     { icon: "🍃", titulo: "Nay Banana Melon", preco: "10,00", tag: "Essência" },
-    { icon: "🍃", titulo: "Nay Pineapple Twist", preco: "10,00", tag: "Essência" },
-    { icon: "🍃", titulo: "Nay Strawberry Blend", preco: "10,00", tag: "Essência" },
-    { icon: "🍃", titulo: "Nay Pineapple Grape", preco: "10,00", tag: "Essência" },
+    { foto: "assets/produtos/nay-pineapple-twist.jpg", titulo: "Nay Pineapple Twist", preco: "10,00", tag: "Essência" },
+    { foto: "assets/produtos/nay-strawberry-blend.jpg", titulo: "Nay Strawberry Blend", preco: "10,00", tag: "Essência" },
+    { foto: "assets/produtos/nay-pineapple-grape.jpg", titulo: "Nay Pineapple Grape", preco: "10,00", tag: "Essência" },
     { icon: "🍃", titulo: "Nay Snow", preco: "10,00", tag: "Essência" },
     { icon: "🍃", titulo: "Dublin Menta", preco: "16,00", tag: "Tabaco" },
+    { foto: "assets/produtos/lust-perfect-milk.jpg", titulo: "Lust Perfect Milk", preco: "10,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Smyrna Melancia Kiwi", preco: "10,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Bull Black Mint", preco: "15,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Onix Starcoffee", preco: "10,00", tag: "Essência" },
+    { icon: "🍃", titulo: "Zgy Watermelon Bomb", preco: "10,00", tag: "Essência" },
 
     // — Blunt —
-    { icon: "🍂", titulo: "Blunt King Chocolate", preco: "9,00", tag: "Blunt" },
+    { foto: "assets/produtos/blunt-king-chocolate.jpg", titulo: "Blunt King Chocolate", preco: "9,00", tag: "Blunt" },
     { icon: "🍂", titulo: "Blunt King Maçã Verde", preco: "9,00", tag: "Blunt" },
     { icon: "🍂", titulo: "Blunt King Melancia", preco: "9,00", tag: "Blunt" },
+    { foto: "assets/produtos/blunt-king-uva.jpg", titulo: "Blunt King Uva", preco: "11,99", tag: "Blunt" },
 
     // — Acessórios —
     { icon: "⚙️", titulo: "Dichavador de Coco", preco: "3,00", tag: "Acessório" },
     { foto: "assets/produtos/dichavador-bem-bolado.jpg", titulo: "Dichavador Bem Bolado", preco: "10,00", tag: "Acessório" },
-    { icon: "🔥", titulo: "Isqueiro Bic Pequeno", preco: "4,00", tag: "Acessório" },
+    { foto: "assets/produtos/isqueiro-bic.jpg", titulo: "Isqueiro Bic Pequeno", preco: "4,00", tag: "Acessório" },
     { icon: "🖊️", titulo: "Clipper", preco: "8,00", tag: "Acessório" },
     { foto: "assets/produtos/filtros.jpg", titulo: "Filtros", preco: "9,00", tag: "Acessório" },
     { icon: "✂️", titulo: "Tesoura Metal Ponta Redonda", preco: "30,00", tag: "Acessório" },
@@ -593,6 +654,26 @@
     { icon: "🧊", titulo: "Slick de Vidro 2 Partes 9ml", preco: "30,00", tag: "Acessório" },
     { icon: "🥥", titulo: "Cuia King", preco: "15,00", tag: "Acessório" },
     { icon: "🥥", titulo: "Cuia King Roxa", preco: "15,00", tag: "Acessório" },
+    { icon: "🎒", titulo: "Estojo Case Liso (Grande)", preco: "35,00", tag: "Acessório" },
+    { icon: "🧼", titulo: "Limpador de Piteiras", preco: "1,50", tag: "Acessório" },
+
+    // — Alumínio —
+    { icon: "🧻", titulo: "Caixa de Alumínio (50 folhas)", preco: "20,00", tag: "Alumínio" },
+    { icon: "🧻", titulo: "Alumínio Unidade", preco: "0,75", tag: "Alumínio" },
+    { foto: "assets/produtos/aluminio-stan.jpg", titulo: "Alumínio com Relevo Stan", preco: "20,00", tag: "Alumínio" },
+
+    // — Carvão —
+    { icon: "⬛", titulo: "Carvão Unidade", preco: "1,00", tag: "Carvão" },
+    { icon: "⬛", titulo: "Carvão Zomo (500g)", preco: "22,00", tag: "Carvão" },
+
+    // — Palheiro —
+    { icon: "🌾", titulo: "Palheiro (unidade)", preco: "1,50", tag: "Palheiro" },
+    { icon: "🌾", titulo: "Douradinho", preco: "18,00", tag: "Palheiro" },
+
+    // — Bebidas —
+    { icon: "💧", titulo: "Água (unidade)", preco: "2,00", tag: "Bebida" },
+    { icon: "🥤", titulo: "Fanta Laranja (unidade)", preco: "5,00", tag: "Bebida" },
+    { icon: "🧃", titulo: "Ice Corote (unidade)", preco: "7,00", tag: "Bebida" },
   ];
 
   // Liga cada card de categoria (seção Produtos) a uma ou mais tags dos Destaques.
@@ -619,7 +700,7 @@
       const filtro = categoriaParaFiltro[c.titulo] !== undefined ? categoriaParaFiltro[c.titulo] : '';
       return `
       <div class="card" onclick="irParaCategoria('${filtro.replace(/'/g, "\\'")}')">
-        ${c.foto ? `<img class="foto" src="${c.foto}" alt="${c.titulo}">` : `<span class="icon">${c.icon || '🛍️'}</span>`}
+        ${c.foto ? `<img class="icon-img" src="${c.foto}" alt="${c.titulo}">` : `<span class="icon">${c.icon || '🛍️'}</span>`}
         <h3>${c.titulo}</h3>
         <p>${c.texto || ''}</p>
       </div>
@@ -627,16 +708,45 @@
     }).join('');
   }
 
+  let listaRenderizadaAtual = [];
+
   function renderGrid(lista) {
-    document.getElementById('destaquesContainer').innerHTML = lista.map(p => `
-      <div class="price-card">
+    listaRenderizadaAtual = lista;
+    document.getElementById('destaquesContainer').innerHTML = lista.map((p, i) => `
+      <div class="price-card" onclick="abrirModalProduto(${i})">
         <span class="tag">${p.tag || ''}</span>
         ${p.foto ? `<img class="foto" src="${p.foto}" alt="${p.titulo}">` : `<span class="icon">${p.icon || '🛍️'}</span>`}
         <h3>${p.titulo}</h3>
         <p class="price">R$ ${p.preco}<small>confirme disponibilidade no WhatsApp</small></p>
-        <a href="${whatsappLink}" target="_blank" rel="noopener" class="btn btn-primary">Peça no Zap</a>
+        <a href="${whatsappLink}" target="_blank" rel="noopener" class="btn btn-primary" onclick="event.stopPropagation()">Peça no Zap</a>
       </div>
     `).join('');
+  }
+
+  function abrirModalProduto(idx) {
+    const p = listaRenderizadaAtual[idx];
+    if (!p) return;
+    const fotoEl = document.getElementById('modalFoto');
+    const iconEl = document.getElementById('modalIcon');
+    if (p.foto) {
+      fotoEl.src = p.foto;
+      fotoEl.style.display = 'block';
+      iconEl.style.display = 'none';
+    } else {
+      fotoEl.style.display = 'none';
+      iconEl.style.display = 'block';
+      iconEl.textContent = p.icon || '🛍️';
+    }
+    document.getElementById('modalTag').textContent = p.tag || '';
+    document.getElementById('modalTag').style.display = p.tag ? 'inline-block' : 'none';
+    document.getElementById('modalTitulo').textContent = p.titulo;
+    document.getElementById('modalTexto').textContent = p.texto || 'Confirme detalhes e disponibilidade direto no WhatsApp.';
+    document.getElementById('modalPreco').innerHTML = `R$ ${p.preco}<small>confirme disponibilidade no WhatsApp</small>`;
+    document.getElementById('produtoModal').classList.remove('hidden');
+  }
+
+  function fecharModalProduto() {
+    document.getElementById('produtoModal').classList.add('hidden');
   }
 
   function renderFiltros(lista) {
@@ -684,7 +794,7 @@
             .map(r => ({ icon: r.icone, foto: r.foto, titulo: r.titulo, texto: r.texto }));
           const produtos = linhas
             .filter(r => (r.tipo || '').trim().toLowerCase() === 'produto')
-            .map(r => ({ icon: r.icone, foto: r.foto, titulo: r.titulo, preco: r.preco, tag: r.tag }));
+            .map(r => ({ icon: r.icone, foto: r.foto, titulo: r.titulo, preco: r.preco, tag: r.tag, texto: r.texto }));
           if (categorias.length === 0 && produtos.length === 0) {
             reject('planilha vazia ou colunas erradas');
           } else {
