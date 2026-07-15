@@ -8,6 +8,7 @@
 <link rel="icon" href="assets/logo-circular.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Manrope:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
   :root{
     --night:#0b1f2e;
@@ -185,6 +186,7 @@
     background:linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
     border:1px solid rgba(244,201,93,.18);
     border-radius:18px;padding:30px 26px;
+    cursor:pointer;
     transition:transform .25s ease, border-color .25s ease, background .25s ease;
   }
   .card:hover{transform:translateY(-6px);border-color:var(--orange);background:rgba(242,134,29,.06);}
@@ -203,6 +205,15 @@
 
   /* ===== DESTAQUES ===== */
   #destaques{background:var(--night);}
+  .filtros-pills{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;}
+  .filtro-pill{
+    font-family:'Space Mono',monospace;font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;
+    background:transparent;color:#c9d6da;border:1px solid rgba(244,201,93,.3);
+    padding:9px 18px;border-radius:24px;cursor:pointer;
+    transition:background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .filtro-pill:hover{border-color:var(--orange);color:var(--cream);}
+  .filtro-pill.ativo{background:var(--orange);border-color:var(--orange);color:var(--ink);font-weight:700;}
   .price-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;}
   .price-card{
     background:var(--teal-deep);border:1px solid rgba(244,201,93,.15);
@@ -412,6 +423,7 @@
       <h2>Produtos em <em style="color:var(--orange-2);font-style:normal;">destaque</em></h2>
       <p>Direto do nosso estoque, com preço atualizado. Confirme disponibilidade e feche o pedido pelo WhatsApp.</p>
     </div>
+    <div class="filtros-pills" id="filtrosContainer"></div>
     <div class="price-cards" id="destaquesContainer"></div>
   </div>
 </section>
@@ -483,38 +495,41 @@
 
 <script>
   /* ══════════════════════════════════════════════════════════════════
-     🛍️  PAINEL DE PRODUTOS — É SÓ MEXER AQUI, NÃO PRECISA SABER CÓDIGO
+     🛍️  PAINEL DE PRODUTOS — configuração da planilha
      ══════════════════════════════════════════════════════════════════
 
-     COMO ADICIONAR UMA CATEGORIA (seção "Produtos"):
-     1. Copie um bloco inteiro entre as { chaves } (de "{" até "},")
-     2. Cole antes do "];" da lista
-     3. Troque o texto de icon, titulo e texto
-     4. Salve o arquivo — pronto, já aparece no site
+     Agora os produtos podem vir de uma planilha do Google Sheets — edite
+     a planilha, salve, e o site atualiza sozinho (sem mexer em código).
 
-     ONDE PEGAR UM ÍCONE (emoji):
-     Copie e cole qualquer emoji do teclado do seu celular
-     (aperte o botão 🙂 do teclado) ou de emojipedia.org
+     COMO CONFIGURAR (só precisa fazer isso 1 vez):
+     1. Crie uma cópia da planilha modelo no seu Google Drive
+        (Arquivo → Fazer uma cópia)
+     2. Publique ela na web: Arquivo → Compartilhar → Publicar na web
+        → selecione a aba "Produtos" → formato "Valores separados por
+        vírgula (.csv)" → clique em Publicar
+     3. Copie o link gerado e cole aqui embaixo, na linha SHEET_CSV_URL
 
-     ══════════════════════════════════════════════════════════════════
-     📸  COMO USAR FOTO DE VERDADE NO LUGAR DO ÍCONE
-     ══════════════════════════════════════════════════════════════════
-     1. Pegue a pasta "assets" que veio junto com o index.html
-        (crie dentro dela uma pasta chamada "produtos", se ainda não tiver)
-     2. Coloque a foto do produto lá dentro, com um nome simples e sem
-        espaço ou acento. Exemplo: narguile-kaaki.jpg
-     3. No bloco do produto, adicione a linha "foto:" apontando pra ela:
+     Enquanto SHEET_CSV_URL estiver vazio (""), o site usa a lista fixa
+     de produtos definida logo abaixo, como reserva.
 
-        { foto: "assets/produtos/narguile-kaaki.jpg", titulo: "Narguilé Kaaki", texto: "..." },
+     COLUNAS DA PLANILHA (não mude os nomes):
+     tipo | tag | icone | foto | titulo | texto | preco
 
-     4. Quando tem "foto:", ela aparece no lugar do ícone automaticamente.
-        Se não tiver "foto:", continua aparecendo o emoji do "icon:".
-
-     DICA: fotos quadradas (tipo 800x800) ficam melhores. Evite arquivos
-     muito pesados (acima de 1-2 MB deixam o site lento pra carregar).
+     - tipo: "categoria" ou "produto"
+     - tag: nome da categoria (Seda, Piteira...) — só pra "produto"
+     - icone: um emoji (usado se não tiver foto)
+     - foto: link direto da imagem (opcional)
+     - titulo: nome do item
+     - texto: descrição — só pra "categoria"
+     - preco: valor, ex: 8,00 — só pra "produto"
   */
 
-  const categoriasProdutos = [
+  const SHEET_CSV_URL = ""; // 👈 cole aqui o link CSV publicado da sua planilha
+
+  const whatsappLink = "https://wa.me/c/5516996511439";
+
+  // Lista de reserva — usada só se SHEET_CSV_URL estiver vazio ou a planilha falhar ao carregar
+  const categoriasProdutosPadrao = [
     { icon: "💨", titulo: "Nargs", texto: "Narguilés completos e peças avulsas pra montar o seu do seu jeito." },
     { icon: "🍃", titulo: "Essências & Tabacos", texto: "Marcas como Dublin, Amsterdam, Acrema Blend, NAY, ZGY e Smyrna sempre na área." },
     { icon: "🫧", titulo: "Bong", texto: "De vidro, acrílico ou silicone — e as peças de reposição pra manter tudo em ordem." },
@@ -525,19 +540,9 @@
     { icon: "🌾", titulo: "Palheiros", texto: "Seleção de palheiros pra quem já sabe o que gosta." },
     { icon: "🎒", titulo: "Acessórios", texto: "Bandejas, potes, chaveiros, incensos e tudo que falta pro seu setup." },
     { icon: "✨", titulo: "Novidades", texto: "Chegada de produto novo sempre no story do Instagram — fica de olho." },
-    // 👆 copie um bloco acima, cole aqui embaixo e edite pra adicionar uma nova categoria
   ];
 
-  /* COMO ADICIONAR UM PRODUTO EM DESTAQUE (seção "Destaques"):
-     Mesma lógica: copie um bloco { }, cole antes do "];", troque os textos.
-     - foto: (opcional) caminho da imagem, ex: "assets/produtos/seda-raw.jpg"
-     - icon: um emoji pra representar o produto (usado só se não tiver foto)
-     - titulo: nome do produto
-     - preco: o valor (deixe só números, vírgula e ponto, ex: "89,90")
-     - tag: a categoria do produto (ex: "Seda", "Piteira", "Essência", "Acessório")
-  */
-
-  const produtosDestaque = [
+  const produtosDestaquePadrao = [
     // — Sedas —
     { foto: "assets/produtos/seda-raw-black.jpg", titulo: "Seda RAW Black", preco: "8,00", tag: "Seda" },
     { foto: "assets/produtos/seda-raw-organic.jpg", titulo: "Seda RAW Organic", preco: "5,00", tag: "Seda" },
@@ -588,29 +593,119 @@
     { icon: "🧊", titulo: "Slick de Vidro 2 Partes 9ml", preco: "30,00", tag: "Acessório" },
     { icon: "🥥", titulo: "Cuia King", preco: "15,00", tag: "Acessório" },
     { icon: "🥥", titulo: "Cuia King Roxa", preco: "15,00", tag: "Acessório" },
-    // 👆 copie um bloco acima, cole aqui embaixo e edite pra adicionar um novo produto
   ];
 
-  const whatsappLink = "https://wa.me/c/5516996511439";
+  // Liga cada card de categoria (seção Produtos) a uma ou mais tags dos Destaques.
+  // Categorias sem produto correspondente ainda (ex: Nargs, Bong) mostram "Todos" ao clicar.
+  const categoriaParaFiltro = {
+    "Nargs": "",
+    "Essências & Tabacos": "Essência,Tabaco",
+    "Bong": "",
+    "Pipe": "",
+    "Sedas & Piteiras": "Seda,Piteira",
+    "Dichavador": "Acessório",
+    "Isqueiro & Cinzeiro": "Acessório",
+    "Palheiros": "",
+    "Acessórios": "Acessório",
+    "Novidades": "",
+  };
+
+  let produtosAtuais = [];
+  let filtroAtivo = null;
 
   // A partir daqui é só motor — não precisa mexer 👇
-  document.getElementById('categoriasContainer').innerHTML = categoriasProdutos.map(c => `
-    <div class="card">
-      ${c.foto ? `<img class="foto" src="${c.foto}" alt="${c.titulo}">` : `<span class="icon">${c.icon}</span>`}
-      <h3>${c.titulo}</h3>
-      <p>${c.texto}</p>
-    </div>
-  `).join('');
+  function renderCategorias(lista) {
+    document.getElementById('categoriasContainer').innerHTML = lista.map(c => {
+      const filtro = categoriaParaFiltro[c.titulo] !== undefined ? categoriaParaFiltro[c.titulo] : '';
+      return `
+      <div class="card" onclick="irParaCategoria('${filtro.replace(/'/g, "\\'")}')">
+        ${c.foto ? `<img class="foto" src="${c.foto}" alt="${c.titulo}">` : `<span class="icon">${c.icon || '🛍️'}</span>`}
+        <h3>${c.titulo}</h3>
+        <p>${c.texto || ''}</p>
+      </div>
+    `;
+    }).join('');
+  }
 
-  document.getElementById('destaquesContainer').innerHTML = produtosDestaque.map(p => `
-    <div class="price-card">
-      <span class="tag">${p.tag}</span>
-      ${p.foto ? `<img class="foto" src="${p.foto}" alt="${p.titulo}">` : `<span class="icon">${p.icon}</span>`}
-      <h3>${p.titulo}</h3>
-      <p class="price">R$ ${p.preco}<small>confirme disponibilidade no WhatsApp</small></p>
-      <a href="${whatsappLink}" target="_blank" rel="noopener" class="btn btn-primary">Peça no Zap</a>
-    </div>
-  `).join('');
+  function renderGrid(lista) {
+    document.getElementById('destaquesContainer').innerHTML = lista.map(p => `
+      <div class="price-card">
+        <span class="tag">${p.tag || ''}</span>
+        ${p.foto ? `<img class="foto" src="${p.foto}" alt="${p.titulo}">` : `<span class="icon">${p.icon || '🛍️'}</span>`}
+        <h3>${p.titulo}</h3>
+        <p class="price">R$ ${p.preco}<small>confirme disponibilidade no WhatsApp</small></p>
+        <a href="${whatsappLink}" target="_blank" rel="noopener" class="btn btn-primary">Peça no Zap</a>
+      </div>
+    `).join('');
+  }
+
+  function renderFiltros(lista) {
+    const tags = [...new Set(lista.map(p => p.tag).filter(Boolean))];
+    const pills = ['Todos', ...tags];
+    document.getElementById('filtrosContainer').innerHTML = pills.map(tag => `
+      <button type="button" class="filtro-pill ${tag === 'Todos' && !filtroAtivo ? 'ativo' : ''}" data-tag="${tag === 'Todos' ? '' : tag}" onclick="filtrarDestaques(this.dataset.tag)">${tag}</button>
+    `).join('');
+  }
+
+  function filtrarDestaques(tagsStr) {
+    filtroAtivo = tagsStr || null;
+    const tags = filtroAtivo ? filtroAtivo.split(',').map(t => t.trim()) : null;
+    const filtrados = tags ? produtosAtuais.filter(p => tags.includes(p.tag)) : produtosAtuais;
+    renderGrid(filtrados);
+    document.querySelectorAll('.filtro-pill').forEach(btn => {
+      const btnTag = btn.dataset.tag;
+      const ativo = (!filtroAtivo && !btnTag) || (filtroAtivo === btnTag);
+      btn.classList.toggle('ativo', ativo);
+    });
+  }
+
+  function irParaCategoria(tagsStr) {
+    document.getElementById('destaques').scrollIntoView({ behavior: 'smooth' });
+    filtrarDestaques(tagsStr);
+  }
+
+  function renderDestaques(lista) {
+    produtosAtuais = lista;
+    renderFiltros(lista);
+    renderGrid(lista);
+  }
+
+  function carregarDaPlanilha() {
+    return new Promise((resolve, reject) => {
+      if (!SHEET_CSV_URL) { reject('SHEET_CSV_URL vazio'); return; }
+      Papa.parse(SHEET_CSV_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const linhas = results.data.filter(r => r.titulo && r.titulo.trim());
+          const categorias = linhas
+            .filter(r => (r.tipo || '').trim().toLowerCase() === 'categoria')
+            .map(r => ({ icon: r.icone, foto: r.foto, titulo: r.titulo, texto: r.texto }));
+          const produtos = linhas
+            .filter(r => (r.tipo || '').trim().toLowerCase() === 'produto')
+            .map(r => ({ icon: r.icone, foto: r.foto, titulo: r.titulo, preco: r.preco, tag: r.tag }));
+          if (categorias.length === 0 && produtos.length === 0) {
+            reject('planilha vazia ou colunas erradas');
+          } else {
+            resolve({ categorias, produtos });
+          }
+        },
+        error: () => reject('erro ao buscar a planilha'),
+      });
+    });
+  }
+
+  carregarDaPlanilha()
+    .then(({ categorias, produtos }) => {
+      renderCategorias(categorias.length ? categorias : categoriasProdutosPadrao);
+      renderDestaques(produtos.length ? produtos : produtosDestaquePadrao);
+    })
+    .catch(() => {
+      // Planilha não configurada ou indisponível — usa a lista fixa de reserva
+      renderCategorias(categoriasProdutosPadrao);
+      renderDestaques(produtosDestaquePadrao);
+    });
   /* ══════════════════ FIM DO PAINEL DE PRODUTOS ══════════════════ */
 
   const header = document.getElementById('siteHeader');
